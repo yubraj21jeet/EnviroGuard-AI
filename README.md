@@ -40,430 +40,64 @@ The system calculates real-time flood risk based on multiple environmental facto
 3. Open `EnviroGuard.ino` in Arduino IDE.
 4. Install `Adafruit SSD1306` and `Adafruit GFX` libraries.
 5. Upload to ESP32 and monitor via Serial/OLED.
-2. Detection vs Prediction
+2. Detection vs Prediction# EnviroGuard AI — AI Architecture
 
-A key distinction in EnviroGuard AI is the difference between detecting current risk and estimating future risk.
+## Overview
 
-Current Prototype
+EnviroGuard AI is an IoT-based flood-risk monitoring and early-warning system.
+
+The current prototype monitors three core environmental parameters:
+
+- Water Level
+- Rainfall
+- Soil Moisture
+
+The prototype demonstrates real-time environmental monitoring and deterministic risk assessment. The planned full-scale system extends this architecture with time-series analysis, machine learning, historical data, and additional environmental information.
+
+> **Note:** EnviroGuard AI estimates evolving flood risk. It does not claim to predict the exact time or certainty of a flood.
+
+---
+
+## 1. Prototype vs Real-World Deployment
+
+The prototype uses three sensors to demonstrate the core sensing and risk-assessment pipeline.
+
+A real-world deployment would use multiple distributed sensor nodes and additional environmental parameters.
+
+| Parameter | Possible Sensor | Purpose |
+|---|---|---|
+| Water Level | Radar / Industrial Ultrasonic Sensor | Monitor river, drain, or reservoir levels |
+| Rainfall | Tipping-Bucket Rain Gauge | Measure rainfall amount and rate |
+| Flow Velocity | Doppler / Ultrasonic Flow Sensor | Detect rapidly moving water |
+| Soil Moisture | Industrial Capacitive Sensor | Measure ground saturation |
+| Temperature | Industrial Temperature Sensor | Environmental context |
+| Humidity | Industrial Humidity Sensor | Monitor atmospheric conditions |
+| Atmospheric Pressure | Barometric Sensor | Detect weather trends |
+| Camera | IP / Edge Camera | Visual confirmation |
+| Location | GPS / GNSS | Identify sensor-node location |
+
+The prototype uses an **ESP32** as the controller. A production deployment could use industrial IoT or edge controllers depending on site conditions, power availability, communication requirements, and reliability needs.
+
+---
+
+## 2. Detection vs Prediction
+
+One of the main goals of EnviroGuard AI is to move from simple **current-risk detection** toward **future-risk estimation**.
+
+### Current Prototype
+
+```text
 Water Level
-     +
+    +
 Rainfall
-     +
+    +
 Soil Moisture
-     ↓
+    |
+    v
 Risk Calculation
-     ↓
+    |
+    v
 Risk Score
-     ↓
+    |
+    v
 NORMAL / WARNING / CRITICAL
-
-This provides immediate and deterministic risk assessment.
-
-Future AI System
-Real-Time Sensor Data
-          +
-Time-Series Trends
-          +
-Historical Data
-          +
-Weather Information
-          +
-Upstream / Environmental Data
-          ↓
-       ML MODEL
-          ↓
-   Flood-Risk Estimate
-          +
-     Risk Level
-          +
-    Early Warning
-          +
-     Explanation
-
-The major improvement is that the system can consider how conditions are changing, not just their current values.
-
-3. How the AI Estimates Flood Risk
-
-The AI layer can analyse several categories of information.
-
-3.1 Current Environmental Conditions
-
-Example:
-
-Water Level     : 68%
-Rainfall        : 82%
-Soil Moisture   : 76%
-
-These values describe the current state of the monitored environment.
-
-3.2 Rate of Change
-
-A single sensor reading does not tell the complete story.
-
-For example:
-
-10:00 → 45%
-10:10 → 51%
-10:20 → 58%
-10:30 → 66%
-
-The water level is not simply high — it is rising rapidly.
-
-The system can therefore calculate features such as:
-
-Water-Level Rate of Change
-Rainfall Rate of Change
-Soil-Moisture Rate of Change
-Rolling Average
-Rolling Rainfall Accumulation
-Water-Level Acceleration
-
-These time-series features provide more information than a single measurement.
-
-4. Sensor Correlation
-
-The system can analyse relationships between environmental parameters.
-
-For example:
-
-Heavy Rainfall
-      ↓
-Soil Saturation Increases
-      ↓
-Water Level Begins Rising
-      ↓
-Water Level Rises Rapidly
-      ↓
-Flood Risk Escalates
-
-Instead of treating every sensor independently, the AI/ML layer can learn patterns across multiple measurements.
-
-This is one of the main ways predictive modelling can provide additional value over a simple fixed threshold.
-
-5. Historical Pattern Analysis
-
-Historical data can help identify conditions associated with previous flood-risk events.
-
-For example:
-
-High Rainfall
-+
-High Soil Saturation
-+
-Rapid Water-Level Increase
-        ↓
-Elevated Historical Risk Pattern
-
-A trained ML model can learn relationships from properly labelled historical observations.
-
-The model should be trained using representative real-world data rather than relying only on manually selected thresholds.
-
-6. External Environmental Information
-
-A full-scale EnviroGuard AI deployment could incorporate additional data sources such as:
-
-Weather forecasts
-Rainfall forecasts
-Upstream water levels
-River and reservoir measurements
-Historical flood records
-Geographic information
-Elevation/topography
-Land-use information
-Camera observations
-
-This would allow the system to understand the monitored environment using a broader context.
-
-7. Role of n8n
-
-n8n is the orchestration layer — not the flood-prediction model.
-
-Its role is to connect the different components of the system.
-
-             ESP32
-               │
-               ▼
-          Sensor Data
-               │
-               ▼
-              n8n
-               │
-       ┌───────┼────────┐
-       ▼       ▼        ▼
-   Validate   Store   Process
-       │       Data      │
-       └───────┼────────┘
-               ▼
-        Historical Data
-               +
-         Current Data
-               │
-               ▼
-          ML / AI Layer
-               │
-               ▼
-       Flood-Risk Estimate
-               │
-        ┌──────┴──────┐
-        ▼             ▼
-    Dashboard       Alerts
-Component Responsibilities
-Component	Responsibility
-ESP32	Sensor acquisition and local safety logic
-IoT Network	Data transmission
-n8n	Workflow orchestration
-Database	Historical/time-series storage
-ML Model	Predictive risk estimation
-AI/LLM	Explanation and contextual analysis
-Dashboard	Monitoring and visualization
-Alert System	User/operator notifications
-8. AI Model Development Strategy
-
-EnviroGuard AI should evolve gradually rather than immediately using a complex neural network.
-
-Stage 1 — Prototype
-Rule-Based
-+
-Weighted Risk Score
-
-Example:
-
-Water Level    → 50%
-Rainfall       → 30%
-Soil Moisture  → 20%
-
-This provides a transparent baseline.
-
-Stage 2 — Machine Learning
-
-Potential models:
-
-Logistic Regression
-Random Forest
-XGBoost
-Stage 3 — Advanced Time-Series Models
-
-After collecting enough high-quality data, models such as:
-
-LSTM
-GRU
-Other sequence/time-series architectures
-
-can be evaluated.
-
-A complex model is not automatically better. Data quality, correct labelling, validation, and generalisation are more important than model complexity.
-
-9. Example AI Output
-
-Instead of simply displaying:
-
-FLOOD = YES
-
-EnviroGuard AI can provide an explainable environmental assessment:
-
-╔══════════════════════════════════╗
-║      ENVIRONMENTAL ANALYSIS      ║
-╚══════════════════════════════════╝
-
-Water Level       : 72%
-Rainfall          : 84%
-Soil Moisture     : 79%
-
-Water Trend       : RAPIDLY RISING
-Rain Trend        : INCREASING
-Soil Condition    : HIGH SATURATION
-
-Risk Score        : 86 / 100
-Risk Level        : CRITICAL
-
-KEY FACTORS
-• Heavy rainfall
-• High soil saturation
-• Rapid water-level increase
-
-ASSESSMENT
-Elevated flood-risk conditions are
-developing in the monitored area.
-
-OUTLOOK
-Risk may increase if the current
-environmental trend continues.
-10. Risk Score vs Probability
-
-The prototype should distinguish between a risk score and a statistically validated probability.
-
-For example:
-
-Risk Score: 86 / 100
-
-is appropriate for a weighted prototype.
-
-However:
-
-Flood Probability: 86%
-
-should only be reported after a properly trained, validated, and appropriately calibrated predictive model produces that probability.
-
-Therefore, the preferred terminology during the prototype stage is:
-
-Flood Risk Score
-
-or
-
-Estimated Flood Risk
-
-11. Safety Architecture
-
-The AI system should not depend entirely on an AI model or LLM for emergency decisions.
-
-EnviroGuard AI follows a layered approach:
-
-┌─────────────────────────────┐
-│     Local Safety Logic      │
-│           ESP32             │
-└──────────────┬──────────────┘
-               ↓
-┌─────────────────────────────┐
-│    Deterministic Risk       │
-│          Engine             │
-└──────────────┬──────────────┘
-               ↓
-┌─────────────────────────────┐
-│       ML Risk Model         │
-└──────────────┬──────────────┘
-               ↓
-┌─────────────────────────────┐
-│      AI Explanation         │
-└──────────────┬──────────────┘
-               ↓
-┌─────────────────────────────┐
-│       Alert / Dashboard     │
-└─────────────────────────────┘
-
-This provides a defense-in-depth architecture.
-
-If cloud AI or network connectivity becomes unavailable, local deterministic safety logic can still provide basic prototype-level warnings.
-
-12. Complete System Architecture
-                         ENVIRONMENT
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        ↓                     ↓                     ↓
-   WATER LEVEL            RAINFALL             SOIL MOISTURE
-        │                     │                     │
-        └─────────────────────┼─────────────────────┘
-                              ↓
-                       ESP32 SENSOR NODE
-                              ↓
-                       Wi-Fi / IoT Network
-                              ↓
-                             n8n
-                              ↓
-                     DATA PRE-PROCESSING
-                              ↓
-                ┌─────────────┴─────────────┐
-                ↓                           ↓
-         HISTORICAL DATA              CURRENT DATA
-                │                           │
-                └─────────────┬─────────────┘
-                              ↓
-                       AI / ML ANALYSIS
-                              ↓
-          ┌───────────────────┼───────────────────┐
-          ↓                   ↓                   ↓
-      CURRENT              TREND             HISTORICAL
-     CONDITIONS           ANALYSIS             PATTERNS
-          └───────────────────┼───────────────────┘
-                              ↓
-                       FLOOD-RISK MODEL
-                              ↓
-                     RISK SCORE / LEVEL
-                              ↓
-             ┌────────────────┼────────────────┐
-             ↓                ↓                ↓
-          NORMAL           WARNING          CRITICAL
-             ↓                ↓                ↓
-         Monitoring         Alert       Emergency Alert
-                              │
-                              ▼
-                       DASHBOARD / USER
-13. What Does AI Actually Add?
-
-A judge may ask:
-
-"You can already calculate risk using a formula. What is AI actually adding?"
-
-Answer
-
-"Our prototype uses a weighted risk score for basic real-time assessment. The AI/ML layer goes beyond fixed thresholds by analysing time-series sensor data, rate of change, relationships between rainfall, soil saturation and water level, and historical patterns. This allows the system to estimate evolving flood risk rather than only detecting the present condition. The deterministic rule-based layer provides immediate safety logic, while the ML layer provides predictive intelligence and the AI explanation layer helps communicate the factors behind the risk."
-
-14. Key Technical Position
-
-EnviroGuard AI is not claiming to magically predict floods.
-
-The project's approach is:
-
-Sense
-  ↓
-Validate
-  ↓
-Store
-  ↓
-Analyse
-  ↓
-Learn Patterns
-  ↓
-Estimate Risk
-  ↓
-Explain Risk
-  ↓
-Warn Users
-
-The long-term objective is to transform raw environmental measurements into early, explainable, and actionable flood-risk information.
-
-🚀 Future Development
- Deploy multiple sensor nodes
- Add MQTT/IoT communication
- Add time-series database
- Collect real historical data
- Engineer temporal features
- Benchmark Logistic Regression, Random Forest and XGBoost
- Evaluate time-series models when sufficient data is available
- Integrate weather information
- Integrate upstream river-level data
- Add camera-based verification
- Add sensor fault detection
- Add GPS-based sensor mapping
- Add SMS/mobile alerts
- Build live monitoring dashboard
- Add model validation and drift monitoring
- Implement redundant communication and power systems for field deployment
-📌 Project Principle
-
-"The goal is not to simply detect water. The goal is to understand how environmental conditions are changing and provide earlier, more explainable flood-risk information."
-
-Recommended GitHub placement
-EnviroGuard-AI/
-│
-├── README.md
-│
-├── docs/
-│   ├── AI-ARCHITECTURE.md       ← THIS FILE
-│   ├── judge-questions.md
-│   ├── real-world-deployment.md
-│   └── architecture.md
-│
-├── firmware/
-├── ai/
-├── n8n/
-├── dashboard/
-└── hardware/.
-
-Then add this to your main README.md:
-
-## 📚 Documentation
-
-- [AI Architecture & Judge Preparation](docs/AI-ARCHITECTURE.md)
-- [Judge Questions & Answers](docs/judge-questions.md)
-- [Real-World Deployment](docs/real-world-deployment.md)
-- [System Architecture](docs/architecture.md)
