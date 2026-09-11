@@ -457,7 +457,7 @@ EnviroGuard-AI/
 ├── ai/
 ├── n8n/
 ├── dashboard/
-└── hardware/
+└── hardware/.
 
 Then add this to your main README.md:
 
