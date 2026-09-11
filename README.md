@@ -101,3 +101,153 @@ Risk Score
     |
     v
 NORMAL / WARNING / CRITICAL
+Real-Time Sensor Data
+        +
+Time-Series Trends
+        +
+Historical Data
+        +
+Weather Information
+        +
+Upstream Environmental Data
+        |
+        v
+    ML MODEL
+        |
+        v
+Flood-Risk Estimate
+        +
+Risk Level
+        +
+Early Warning
+        +
+Explanation
+Water Level    : 68%
+Rainfall       : 82%
+Soil Moisture  : 76%
+10:00 -> 45%
+10:10 -> 51%
+10:20 -> 58%
+10:30 -> 66%
+Heavy Rainfall
+      |
+      v
+Soil Saturation Increases
+      |
+      v
+Water Level Begins Rising
+      |
+      v
+Water Level Rises Rapidly
+      |
+      v
+Flood Risk Escalates
+High Rainfall
+      +
+High Soil Saturation
+      +
+Rapid Water-Level Increase
+      |
+      v
+Elevated Historical Risk Pattern
+ESP32
+  |
+  v
+Sensor Data
+  |
+  v
+n8n
+  |
+  +--> Validate Data
+  |
+  +--> Store Data
+  |
+  +--> Process Data
+  |
+  v
+Historical + Current Data
+  |
+  v
+AI / ML Layer
+  |
+  v
+Flood-Risk Estimate
+  |
+  +--> Dashboard
+  |
+  +--> Alerts
+
+| Parameter     | Weight |
+| ------------- | -----: |
+| Water Level   |    50% |
+| Rainfall      |    30% |
+| Soil Moisture |    20% |
+
+
+
+ENVIRONMENTAL ANALYSIS
+
+Water Level      : 72%
+Rainfall         : 84%
+Soil Moisture    : 79%
+
+Water Trend      : RAPIDLY RISING
+Rain Trend       : INCREASING
+Soil Condition   : HIGH SATURATION
+
+Risk Score       : 86 / 100
+Risk Level       : CRITICAL
+
+KEY FACTORS
+- Heavy rainfall
+- High soil saturation
+- Rapid water-level increase
+
+ASSESSMENT
+Elevated flood-risk conditions are developing
+in the monitored area.
+
+OUTLOOK
+Risk may increase if the current environmental
+trend continues.
+Sense
+  |
+  v
+Validate
+  |
+  v
+Store
+  |
+  v
+Analyse
+  |
+  v
+Learn Patterns
+  |
+  v
+Estimate Risk
+  |
+  v
+Explain Risk
+  |
+  v
+Warn Users
+EnviroGuard-AI/
+|
++-- README.md
+|
++-- docs/
+|   +-- AI-ARCHITECTURE.md
+|   +-- judge-questions.md
+|   +-- real-world-deployment.md
+|   +-- architecture.md
+|
++-- firmware/
+|
++-- ai/
+|
++-- n8n/
+|
++-- dashboard/
+|
++-- hardware/
